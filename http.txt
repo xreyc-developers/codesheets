@@ -1,0 +1,11 @@
+#########HTTP TYPE#########
+
+200 - OK
+201 - Created
+202 - Accepted
+400 - Bad Request
+401 - Unauthorized - Not authenticated
+402 - Payment Required
+403 - Forbidden - Not authorized
+404 - Not Found
+408 - Request Timeout

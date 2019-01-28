@@ -1,0 +1,434 @@
+<?php
+//////////LARAVEL-JWT-WORKFLOW AND CODE SHEETS//////////
+
+
+
+
+##CREATE PROJECT################################################################
+>composer create-project laravel/laravel project_name --prefer-disk
+
+
+
+
+
+
+##ENV FILE################################################################
+===============================================================================================================================================
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=database_name
+DB_USERNAME=root
+DB_PASSWORD=password
+===============================================================================================================================================
+
+
+
+
+
+
+##MIGRATE################################################################
+>php artisan migrate
+:NOTE: this might get an error
+
+
+
+
+
+
+##FIX ERROR################################################################
+@AppServiceProvider.php
+===============================================================================================================================================
+use Illuminate\Supoort\Facades\Schema;
+function boot(){
+    Schema::defaultStringLenght(191);
+}
+===============================================================================================================================================
+
+
+
+
+
+
+##SETTING UP JWT################################################################
+>composer require tymon/jwt-auth
+
+@config/app.php
+===============================================================================================================================================
+'providers' => [
+    Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
+]
+'aliases' => [
+    'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
+]
+===============================================================================================================================================
+
+>php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\JWTAuthServiceProvider"
+>php artisan jwt:generate
+
+:FIX ERROR
+Go to JWTGenerateCommand.php file located in vendor/tymon/src/Commands and paste this part of code 
+public function handle() { $this->fire(); }
+
+
+@app/Http/Kernel.php
+===============================================================================================================================================
+protected $routeMiddleware = [
+    'jwt.auth' => \Tymon\JWTAuth\Middleware\GetUserFromToken::class,
+    'jwt.refresh' => \Tymon\JWTAuth\Middleware\RefreshToken::class,
+];
+===============================================================================================================================================
+
+
+
+
+
+
+##SIGNUP################################################################
+>php artisan make:controller AuthController
+
+@route/api.php
+===============================================================================================================================================
+Route::post('signup', 'AuthController@register');
+===============================================================================================================================================
+
+>php artisan make:request RegisterFormRequest
+
+@Http/Request/RegisterFormRequest
+===============================================================================================================================================
+class RegisterFormRequest extends FormRequest
+{
+    public function authorize()
+    {
+         return true;
+    }
+    public function rules()
+    {
+        return [
+            'name' => 'required|string|unique:users',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|string|min:6|max:10',
+        ];
+    }
+}
+===============================================================================================================================================
+
+@Http/Controllers/AuthController.php
+===============================================================================================================================================
+use Illuminate\Http\Request;
+use App\Http\Requests\RegisterFormRequest;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Auth;
+use App\User;
+
+//REGISTER
+public function register(RegisterFormRequest $request)
+{
+    $user = new User;
+    $user->email = $request->email;
+    $user->name = $request->name;
+    $user->password = bcrypt($request->password);
+    $user->save();
+    return response([
+        'status' => 'success',
+        'data' => $user
+    ], 200);
+ }
+===============================================================================================================================================
+
+
+
+
+
+
+
+##LOGIN################################################################
+@route/api.php
+===============================================================================================================================================
+Route::post('login', 'AuthController@login');
+===============================================================================================================================================
+
+@Http/Controllers/AuthController.php
+===============================================================================================================================================
+//LOGIN
+public function login(Request $request)
+{
+    $credentials = $request->only('email', 'password');
+    if ( ! $token = JWTAuth::attempt($credentials)) {
+        return response([
+            'status' => 'error',
+            'error' => 'invalid.credentials',
+            'msg' => 'Invalid Credentials.'
+        ], 400);
+    }
+    return response([
+        'status' => 'success',
+        'token' => $token
+    ]);
+}
+===============================================================================================================================================
+
+
+
+
+
+
+##CUURENT USER################################################################
+@route/api.php
+===============================================================================================================================================
+Route::group(['middleware' => 'jwt.auth'], function(){
+  Route::get('auth/user', 'AuthController@user');
+});
+===============================================================================================================================================
+
+@Http/Controllers/AuthController.php
+===============================================================================================================================================
+//USER DETAILS
+public function user(Request $request)
+{
+    $user = User::find(Auth::user()->id);
+    return response([
+        'status' => 'success',
+        'data' => $user
+    ]);
+}
+===============================================================================================================================================
+
+
+
+
+
+
+##LOGOUT################################################################
+@route/api.php
+===============================================================================================================================================
+Route::group(['middleware' => 'jwt.auth'], function(){
+   Route::post('auth/logout', 'AuthController@logout');
+});
+===============================================================================================================================================
+
+@Http/Controllers/AuthController.php
+===============================================================================================================================================
+public function logout()
+{
+    JWTAuth::invalidate();
+    return response([
+        'status' => 'success',
+        'msg' => 'Logged out Successfully.'
+    ], 200);
+}
+===============================================================================================================================================
+
+
+
+
+
+##REFRESH TOKEN################################################################
+@route/api.php
+===============================================================================================================================================
+Route::middleware('jwt.refresh')->get('/token/refresh', 'AuthController@refresh');
+===============================================================================================================================================
+
+@Http/Controllers/AuthController.php
+===============================================================================================================================================
+public function refresh()
+{
+    return response([
+     'status' => 'success'
+    ]);
+}
+===============================================================================================================================================
+
+
+
+
+
+##PRODUCTS ROUTES################################################################
+===============================================================================================================================================
+use Illuminate\Http\Request;
+////////////////////////////PUBLIC ROUTES///////////////////////////
+//LOGIN AND SIGNUP
+Route::post('signup', 'AuthController@register');
+Route::post('login', 'AuthController@login');
+
+//PRODUCTS
+Route::get('products', 'ProductController@pubIndex');
+Route::get('products/{id}', 'ProductController@pubShow');
+
+////////////////////////AUTHENTICATED ROUTES////////////////////////
+Route::group(['middleware' => 'jwt.auth'], function(){
+    //USER ACCOUNT
+    Route::get('auth/user', 'AuthController@user');
+    Route::post('auth/logout', 'AuthController@logout');
+
+    //USER PRODUCTS
+    Route::resource('auth/products', 'ProductController');
+});
+
+///////////////////////////FUNCTIONAL ROUTES////////////////////////
+Route::middleware('jwt.refresh')->get('/token/refresh', 'AuthController@refresh');
+===============================================================================================================================================
+
+
+
+
+##PRODUCTS MODELS################################################################
+===============================================================================================================================================
+namespace App;
+use Illuminate\Database\Eloquent\Model;
+
+class Product extends Model
+{
+    protected $fillable = [
+        'name', 'price'
+    ];
+}
+===============================================================================================================================================
+
+
+
+
+
+##PRODUCTS CONTROLLER################################################################
+===============================================================================================================================================
+namespace App\Http\Controllers;
+use App\Product;
+use Illuminate\Http\Request;
+ 
+class ProductController extends Controller
+{
+
+    ////////////////////////PUBLIC ACCESS////////////////////////////////
+    //READ ALL
+    public function pubIndex()
+    {
+        $products = Product::paginate(10);
+        //return response()->json([
+        //    'success' => true,
+        //    'data' => $products
+        //]);
+        return response()->json($products);
+    }
+
+    //READ BY ID
+    public function pubShow($id)
+    {
+        $products = Product::findOrfail($id);
+        return response()->json([
+            'success' => true,
+            'data' => $products
+        ]);
+    }
+
+
+    ////////////////////////PRIVATE ACCESS////////////////////////////////
+    //READ ALL
+    public function index()
+    {
+        $products = auth()->user()->products;
+ 
+        return response()->json([
+            'success' => true,
+            'data' => $products
+        ]);
+    }
+ 
+    //READ BY ID
+    public function show($id)
+    {
+        $product = auth()->user()->products()->find($id);
+ 
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product with id ' . $id . ' not found'
+            ], 400);
+        }
+ 
+        return response()->json([
+            'success' => true,
+            'data' => $product->toArray()
+        ], 400);
+    }
+ 
+    //CREATE
+    public function store(Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required',
+            'price' => 'required|integer'
+        ]);
+ 
+        $product = new Product();
+        $product->name = $request->name;
+        $product->price = $request->price;
+ 
+        if (auth()->user()->products()->save($product))
+            return response()->json([
+                'success' => true,
+                'data' => $product->toArray()
+            ]);
+        else
+            return response()->json([
+                'success' => false,
+                'message' => 'Product could not be added'
+            ], 500);
+    }
+ 
+    //UPDATE
+    public function update(Request $request, $id)
+    {
+        $product = auth()->user()->products()->find($id);
+ 
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product with id ' . $id . ' not found'
+            ], 400);
+        }
+ 
+        $updated = $product->fill($request->all())->save();
+ 
+        if ($updated)
+            return response()->json([
+                'success' => true
+            ]);
+        else
+            return response()->json([
+                'success' => false,
+                'message' => 'Product could not be updated'
+            ], 500);
+    }
+ 
+    //DELETE
+    public function destroy($id)
+    {
+        $product = auth()->user()->products()->find($id);
+ 
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product with id ' . $id . ' not found'
+            ], 400);
+        }
+ 
+        if ($product->delete()) {
+            return response()->json([
+                'success' => true
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product could not be deleted'
+            ], 500);
+        }
+    }
+}
+===============================================================================================================================================
+
+
+
+
+
+
+

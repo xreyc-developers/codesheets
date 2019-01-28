@@ -1,0 +1,98 @@
+##########CSS CODESHEETS###############
+
+##GRIDS
+<style>
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  background-color: #2196F3;
+}
+.grid-item {
+  background-color: #fff
+}
+</style>
+<div class="grid-container">
+  <div class="grid-item">1</div>
+  <div class="grid-item">2</div>
+  <div class="grid-item">3</div>  
+  <div class="grid-item">4</div>
+  <div class="grid-item">5</div>
+</div>
+
+
+
+
+
+
+##FLEX
+<style>
+.flex-container {
+  display: flex;
+  flex-wrap: nowrap;
+  background-color: DodgerBlue;
+}
+.flex-container > div {
+  background-color: #f1f1f1;
+  width: 100px;
+  margin: 10px;
+  text-align: center;
+  line-height: 75px;
+}
+</style>
+<div class="flex-container">
+  <div>1</div>
+  <div>2</div>
+  <div>3</div>  
+  <div>4</div>
+  <div>5</div>
+</div>
+
+
+
+
+
+
+##PSEUDO CLASS
+a:link {
+  color: #FF0000;
+}
+
+
+
+
+
+##PSEUDO ELEMENT
+p::first-line {
+  color: #ff0000;
+  font-variant: small-caps;
+}
+
+
+
+
+
+##CSS SIZING
+width: 100%; /*Percentage*/
+width: 50vw; width: 50vh; /*default W: 100vw, H: 100vh*/
+width: 50vmin; width: 50vmax; /*Does not move until reach or overflow 100vw/vh */
+
+<div class="parent">2
+    <div class="child"></div>
+</div>
+<style>
+    .parent{
+        font-size: 50px;
+    }
+    .child{
+        width: 1em; /* 1x50px = 50px */
+        width: 2em; /* 2x50px = 100px */
+    }
+</style>
+
+
+
+
+##USEFUL CSS
+
+box-sizing: border-box; //not allow child to breakout from it's parent
+

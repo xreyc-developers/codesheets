@@ -1,0 +1,14 @@
+#######DJANGO REST API WORKFLOW#######
+
+##INSTALL DJANGO REST FRAMEWORK
+>pip install djangorestframework
+
+##CREATE PROJECT
+>django-admin startproject store_api
+
+##CREATE APP
+>python manage.py startup products
+
+##INSTALL JWT
+>pip install djangorestframework-jwt
+

@@ -1,0 +1,240 @@
+########JQUERY CODESHEETS#########
+
+##SYNTAX
+$(selector).action()
+
+$(this).hide()    - hides the current element.
+$("p").hide()     - hides all <p> elements.
+$(".test").hide() - hides all elements with class="test".
+$("#test").hide() - hides the element with id="test".
+
+
+
+
+
+##READY JQUERY
+$(document).ready(function(){
+  // jQuery methods go here...
+});
+//SHORTER VERSION
+$(function(){
+  // jQuery methods go here...
+});
+
+
+
+
+
+##SELECTORS
+$("p")     - Element
+$("#test") - Id
+$(".test") - Class
+
+
+
+
+
+##EVENTS
+$(document).ready(function(){
+  $("button").click(function(){
+    $("p").hide();
+  });
+});
+
+$("p").click(function(){});    - Single click
+$("p").dblclick(function(){}); - Double click
+$("#p1").hover(function(){});  - Hover
+
+//ON OR MORE EVENT HANDLER
+$("p").on({
+  mouseenter: function(){
+    $(this).css("background-color", "lightgray");
+  }, 
+  mouseleave: function(){
+    $(this).css("background-color", "lightblue");
+  }, 
+  click: function(){
+    $(this).css("background-color", "yellow");
+  } 
+});
+
+
+
+
+
+##EFFECTS
+>Hide/Show
+$("p").hide(1000); - Hide
+$("p").show(1000); - Show
+$("p").toggle();   - Hide/Show
+
+>FADEIN/FADEOUT
+$(selector).fadeIn(speed,callback);  - Fadein
+$("#div1").fadeIn();
+$("#div2").fadeIn("slow");
+$("#div3").fadeIn(3000);
+
+$("#div1").fadeOut();      - Fadeout
+$("#div1").fadeToggle();   - FadeIn/FadeOut
+
+>SLIDE
+$("#panel").slideDown();   - Slidedown
+$("#panel").slideUp();     - Slideup
+$("#panel").slideToggle(); - Slide Down/Up
+
+>ANIMATION
+$(selector).animate({params},speed,callback);
+
+$("div").animate({left: '250px'});  - Animation 1
+$("div").animate({left: '250px', opacity: '0.5', height: '150px', width: '150px' });
+$("div").animate({left: '250px', height: '+=150px', width: '+=150px'});
+$("div").animate({height: 'toggle'});
+
+var div = $("div");
+div.animate({height: '300px', opacity: '0.4'}, "slow");
+div.animate({width: '300px', opacity: '0.8'}, "slow");
+div.animate({height: '100px', opacity: '0.4'}, "slow");
+div.animate({width: '100px', opacity: '0.8'}, "slow");
+
+>STOP
+$(selector).stop(stopAll,goToEnd);
+$("#panel").stop();
+
+
+
+
+
+##CALLBACK
+$(selector).hide(speed,callback);
+
+
+
+
+
+##CHAINING
+$("#p1").css("color", "red").slideUp(2000).slideDown(2000);
+
+
+
+
+
+##GET METHOD
+$("#test").text() - Text
+$("#test").html() - HTML inside element with id=test
+$("#test").val()  - Get Input value
+
+
+
+
+
+##SET METHOD
+$("#test").text("Hello") - Text
+$("#test").html("<b>Hello<b>") - HTML inside element with id=test
+$("#test").val("Hello")  - Get Input value
+
+
+
+
+
+##ADD METHOD
+>APPEND
+$("p").append("Some appended text.");  - Add to the START
+$("p").append("<b>Appended text</b>.");
+$("p").prepend("Some prepended text."); - Add to the END
+
+>PREPEND
+function appendText() {
+  var txt1 = "<p>Text.</p>";              // Create text with HTML
+  var txt2 = $("<p></p>").text("Text.");  // Create text with jQuery
+  var txt3 = document.createElement("p");
+  txt3.innerHTML = "Text.";               // Create text with DOM
+  $("body").append(txt1, txt2, txt3);     // Append new elements
+}
+<button onclick="appendText()">Append text</button>
+
+>BEFORE AND AFTER
+$("img").after("Some text after");
+$("img").before("Some text before");
+
+
+
+
+
+##REMOVE
+$("#div1").remove();  - Remove the selected
+$("#div1").empty();   - Remove child
+
+
+
+
+
+##CLASS
+<style>
+.important { font-weight: bold; font-size: xx-large; }
+.blue { color: blue; }
+</style>
+
+>ADD
+$("h1, h2, p").addClass("blue");
+$("div").addClass("important");
+
+>REMOVE
+$("h1, h2, p").removeClass("blue");
+
+>TOGGLE
+$("h1, h2, p").toggleClass("blue");
+
+
+
+
+
+##CSS
+css("propertyname");
+css("propertyname","value");
+css({"propertyname":"value","propertyname":"value",...});
+
+>GET VALUE
+$("p").css("background-color")
+
+>SET VALUE
+$("p").css("background-color", "yellow");
+
+>SET MULTIPLE
+$("p").css({"background-color": "yellow", "font-size": "200%"});
+
+
+
+
+
+##WIDTH
+width()               - The width inside padding
+height()
+innerWidth()          - The width outside padding
+innerHeight()
+outerWidth()          - The width outside border
+outerHeight()
+outerWidth(true)      - The width outside the element
+
+$("#div1").width()
+$(document).width()   - Document
+$(window).width()     - Window
+
+
+
+
+
+##GET AND POST
+>GET
+$.get(URL, callback)
+$.get("sample.php", function(data, status){
+    alert("Data: " + data + "\nstatus: " + status);
+});
+
+>POST
+$.post(URL, data, callback)
+$.post("sample.php",
+    { name: "John", age: 25 },
+    function(data, status){
+        alert("Data: " + data + "\nstatus: " + status )
+    }
+)

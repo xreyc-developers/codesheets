@@ -1,0 +1,99 @@
+##DATABASE CONNECTION
+class DBclass {
+    private $_host = "localhost";
+    private $_username = "root";
+    private $_password = "12345";
+    private $_database = "test_database";
+
+    protected $connection;
+
+    public function __construct() {
+        if(!isset($this->connection)){
+            $this->connection = new mysqli($this->_host, $this->_username, $this->_password, $this->_database);
+
+            if(!$this->connection) {
+                echo 'Cannot Connect to databse';
+            }
+        }
+    return $this->connection;
+    }
+}
+
+
+
+##CRUD CONTROLLER
+class Crud extends DBclass {
+    public function __construct(){
+        parent::__construct();
+    }
+
+    //GET, GETBYID
+    public function getData($query) {
+        $result = $this->connection->query($query);
+        if($result == false ){
+            return false;
+        }
+        $rows = array();
+        while($row = $result->fetch_assoc()){
+            $rows[] =  $row;
+        }
+        return $rows;
+    }
+
+    //POST, UPDATE
+    public function execute($query){
+        $result = $this->connection->query($query);
+        if($result == false){
+            echo 'Cannot execute command';
+            return false;
+        } else{
+            return true;
+        }
+    }
+
+    //DELETE
+    public function delete($id, $table) {
+        $query = "DELETE FROM $table WHERE id=$id";
+
+        $result = $this->connection->query($query);
+        if($result == false){
+            echo 'Cannot delete item with id $id';
+            return false;
+        } else{
+            return true;
+        }
+    }
+
+    public function escape_string($value) {
+        return $this->connection->real_escape_string($value);
+    }
+}
+
+
+
+##GET
+$crud = new Crud();
+$query = "SELECT * FROM users ORDER BY id DESC";
+$result = $crud->getData($query);
+
+foreach($result as $ket => $res){
+    echo $res['id'].'<br>';
+    echo $res['name'].'<br>';
+    echo $res['gender'].'<br>';
+}
+
+
+##ADD
+if(isset($_POST['add_user'])){
+    $name = $_POST['name'];
+    $gender = $_POST['gender'];
+
+    $crud = new Crud();
+    $query = "INSERT into users (name, gender) VALUES ('$name', $gender)";
+    $result = $crud->execute($query);
+}
+<form action="add.php" method="POST">
+    <input type="text" name="name">
+    <input type="text" name="gender">
+    <input type="button" name="add_user">
+</form>
