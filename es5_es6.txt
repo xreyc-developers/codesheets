@@ -1,126 +1,177 @@
-///////////////FUNCTIONS////////////////
-//ES5
-function greetings (name) {
-    return 'hello' + name;
+
+####ES5 AND ES6####
+####CODESHEETS####
+
+
+
+##FUNCTION
+--ES5
+function getNum() {
+    return 10;
 }
-//ES6
+--ES6
+const getNum = () => 10;
 
-const greetings = (name) =>
-{
-    return `hello ${name}`;
+
+
+
+##ARRAY FUNCTION
+--ES5
+function getArr() {
+    return [1, 2, 3];
 }
-
-const greetings = name => `hello ${name}`;
-
-
-///////////////OBJECTS////////////////
-//ES5
-var obj1 = { a: 1, b: 2 }
-var obj2 = { a: 2, c:3 , d: 4 }
-var obj3 = Object.assign(obj1, obj2)
-
-//ES6
-const obj1 = { a: 1, b: 2 }
-const obj2 = { a: 2, c: 3, d: 4 }
-const obj3 = { ...obj1, ...obj2 }
-
-//DESCTRUCTURING OBJECT
-//ES5
-var obj1 = { a: 1, b: 2, c: 3, d: 4 }
-
-var a = obj1.a;
-var b = obj1.b;
-var c = obj1.c;
-var d = obj1.d;
-
-//ES6
-const obj1 = { a: 1, b: 2, c: 3, d: 4 }
-const { a, b, c, d} = obj1;
-
-//DEFINING OBJECTS
-var a = 1
-var b = 2
-var c = 3
-var d = 4
-
-//ES5
-var obj1 = { a: a, b: b, c: c, d: d } 
-
-//ES6
-var obj1 = { a, b, c, d }
+--ES6
+const getArr = () => [1, 2, 3];
 
 
-///////////////PROMISE AND CALLBACKS////////////////
-//ES5
-function isGreater (a, b, cb ) {
-    var greater = false
-    if(a > b){
-        greater = true
+
+
+##OBJECT FUNCTION
+--ES5
+function getObj() {
+    return { a: 1, b: 2, c: 3 };
+}
+--ES6
+const getObj = () => ({ a: 1, b: 2, c: 3 });
+
+
+
+
+
+##FUNCTION WITH PARAM
+--ES5
+function calcCircleArea(radius) {
+    return Math.PI * radius * radius;
+}
+--ES6
+const calcCircleArea = (radius) => Math.PI * radius * radius;
+
+
+
+
+##FUNCTION WITH CONDITION
+--ES5
+function calcCircleArea(radius) {
+    if(!radius) {
+        return null;
+    } else {
+    return Math.PI * radius * radius;
     }
-    cb(greater)
+}
+--ES6
+const calcCicleArea = (radius) => {
+    if(!radius){
+        return null;
+    } else {
+        return Math.PI * radius * radius;
+    }
 }
 
-isGreater(1, 2, function(result) {
+
+
+
+##OBJECT MANIPULATION
+-->DESTRUCTURING
+var obj = { a: 1, b: 2 }
+--ES5
+var a = obj.a;
+var b = obj.b;
+--ES6
+var { a, b } = obj;
+
+-->DEFINING
+var a = 1;
+var b = 2;
+--ES5
+var obj = { a: a, b: b }
+--ES6
+var obj = { a, b }
+
+-->MERGE OBJECTS
+var obj1 = { a: 1, b: 2 };
+var obj2 = { c: 3, d: 4 };
+--ES5
+var obj3 = Object.assign(obj1, obj2);
+--ES6
+var obj4 = { ...obj1, ...obj2 }
+
+
+
+
+##CALLBACK VS PROMISE
+--ES5
+function isEvenNumber (num, callback) {
+    if(num % 2 === 0) {
+        callback(true);
+    } else {
+        callback(false);
+    }
+}
+isEvenNumber (10, function(result) {
     if(result) {
-        console.log('greater');
-    }      
-    else {
-        console.log('smaller');
+        console.log('even number');
+    } else {
+        console.log('odd number');
     }
-})
-
-//ES6
-cont isGreater = (a, b) => {
-    return new Promise ((resolve, reject) => {
-        if (a > b) {
-            resolve(true)
+});
+--ES6
+const isEvenNumber = (num) => {
+    return new Promise((resolve, reject) => {
+            if (num % 2 === 0) {
+            resolve(true);
+        } else {
+            reject(false);
         }
-        else {
-            reject(false)
-        }
-    })
-}
-
-isGreater(1, 2)
-    .then(result => {
-    console.log('greater')
-    })
-    .catch(reult => {
-        console.log('smaller');
     });
-
-///////////////EXPORT AND IMPORT MODULES////////////////
-//EXPORTING
-//ES5
-var myModule = { x: 1, y: function(){
-    console.log('This is ES5');
-}}
-
-module.exports = myModule;
-
-//ES6
-const myModule = { x: 1, y: () => {
-    console.log('This is ES6');
-}}
-
-export default myModule;
-
-//IMPORTING
-//ES5
-var myModule = require('./myModule');
-
-//ES6
-import myModule from './myModule';
+};
+isEvenNumber(10)
+    .then((result) => { console.log('even number'); })
+    .catch((error) => { console.log('odd number'); });
 
 
 
 
-///////////////EXPORT AND IMPORT CHILD////////////////
-//ES6
-export const x = 1;
-export const y = 2;
-export const z = 3;
+##MODULE IMPORTS AND EXPORTS
+-->Export
+var testModule = { a: 1, b: 2 };
+--ES5
+module.exports = testMudule;
+--ES6
+export default testModule;
+export const a = 1;
+export const b = 2;
 
-import { a, b, c } from '.myModule';
+-->Import
+--ES5
+var testMoudule = require(./testModule);
+--ES6
+import testModule from './testModule';
+import { a, b } from './restModule';
+
+
+
+
+##BLOCK SCOPING
+var num = 0; // num is globally scoped
+for (let i = 0; i < 5; i++) { // i is block scoped
+  num += i;
+}
+console.log(num); // 0 + 1 + 2 + 3 + 4 = 10
+console.log(i); // undefined
+
+
+
+
+##TEMPLATE LITERAL (')
+const a = 1;
+const b = 'b';
+--ES5
+const c = 'value of a is ' + a + ' and value of b is ' + b;
+--ES6
+const c = `value of a is ${a} and value of b is ${b}`;
+
+
+
+
 
 

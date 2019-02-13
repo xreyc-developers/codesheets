@@ -1,0 +1,80 @@
+##CODEIGNITER##
+
+##MODEL
+$this->load->model('users_model'); //ON CONSTRUCT
+
+##URL
+$this->load->helper('url_helper'); //ON CONSTRUCT
+$this->load->helper('form'); //ON FUNCTION
+
+##URL SEGMENTATION
+http://example.com/index.php/news/local/metro/crime_is_up
+1. news
+2. local
+3. metro
+4. crime_is_up
+$this->uri->segment(3); //METRO
+
+##LIBRARY
+$this->load->library('form_validation'); //ON FUNCTION
+$this->form_validation->set_rules('title', 'Title', 'required'); //ON FUNCTION
+$this->form_validation->set_rules('text', 'Text', 'required'); //ON FUNCTION
+if ($this->form_validation->run() === FALSE) {} //ON FUNCTION
+
+##ERROR
+show_404();
+
+##ROUTING
+example.com/class/function/id/
+$route['product/:num'] = 'catalog/product_lookup';
+$route['products/([a-z]+)/(\d+)'] = '$1/id_$2';
+##VAR_TYPES:
+(:any)
+:num
+##METHODS
+$route['products']['put'] = 'product/insert';
+$route['products/(:num)']['DELETE'] = 'product/delete/$1';
+
+
+
+
+##LOAD VIEW
+$this->load->view('foldername/filename');
+$this->load->view('foldername/filename', $data);
+
+##GET ALL
+$data['faqs'] = $this->faqs_model->get_faqs(); //CONTROLLER
+$query = $this->db->get('faqs');
+return $query->result_array();
+
+##GETBYID
+$query = $this->db->get_where('faqs', array('slug' => $slug));
+$query = $this->db->get_where('users',array('id'=>$id));
+return $query->row_array();
+
+##INSERT
+$this->db->insert('users', $data);
+
+##EDIT
+$id = $this->uri->segment(3);
+$data['user'] = $this->users_model->getById($id);
+$this->load->view('edit', $data);
+
+##UPDATE
+$this->db->where('users.id',$id);
+return $this->db->update('users', $data);
+
+$mdata['name']=$_POST['name'];
+$mdata['email']=$_POST['email'];
+$mdata['address']=$_POST['address'];
+$mdata['mobile']=$_POST['mobile'];
+$res=$this->users_model->update_info($mdata, $_POST['id']);
+
+
+##JOIN
+$this->db->select('t1.name, t2.something, t3.another')
+     ->from('table1 as t1')
+     ->where('t1.id', $id)
+     ->join('table2 as t2', 't1.id = t2.id', 'LEFT')
+     ->join('table3 as t3', 't1.id = t3.id', 'LEFT')
+     ->get();

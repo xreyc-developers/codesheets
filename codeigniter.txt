@@ -1,0 +1,206 @@
+
+######WORKFLOW######
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(30) NOT NULL,
+  `password` varchar(30) NOT NULL,
+  `fname` varchar(100) NOT NULL,
+PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+##CONFIG
+$config['base_url'] = '<a href="http://localhost/codeigniter_crud/';
+
+
+##Users_model.php
+<?php
+class Users_model extends CI_Model {
+	function __construct(){
+		parent::__construct();
+		$this->load->database();
+	}
+ 
+	public function getAllUsers(){
+		$query = $this->db->get('users');
+		return $query->result(); 
+	}
+ 
+	public function insertuser($user){
+		return $this->db->insert('users', $user);
+	}
+ 
+	public function getUser($id){
+		$query = $this->db->get_where('users',array('id'=>$id));
+		return $query->row_array();
+	}
+ 
+	public function updateuser($user, $id){
+		$this->db->where('users.id', $id);
+		return $this->db->update('users', $user);
+	}
+ 
+	public function deleteuser($id){
+		$this->db->where('users.id', $id);
+		return $this->db->delete('users');
+	}
+ 
+}
+?>
+
+
+
+##Users
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+ 
+class Users extends CI_Controller {
+ 
+	function __construct(){
+		parent::__construct();
+		$this->load->helper('url');
+		$this->load->model('users_model');
+	}
+ 
+	public function index(){
+		$data['users'] = $this->users_model->getAllUsers();
+		$this->load->view('user_list.php', $data);
+	}
+ 
+	public function addnew(){
+		$this->load->view('addform.php');
+	}
+ 
+	public function insert(){
+		$user['username'] = $this->input->post('username');
+		$user['password'] = $this->input->post('password');
+		$user['fname'] = $this->input->post('fname');
+ 
+		$query = $this->users_model->insertuser($user);
+ 
+		if($query){
+			header('location:'.base_url().$this->index());
+		}
+ 
+	}
+ 
+	public function edit($id){
+		$data['user'] = $this->users_model->getUser($id);
+		$this->load->view('editform', $data);
+	}
+ 
+	public function update($id){
+		$user['username'] = $this->input->post('username');
+		$user['password'] = $this->input->post('password');
+		$user['fname'] = $this->input->post('fname');
+ 
+		$query = $this->users_model->updateuser($user, $id);
+ 
+		if($query){
+			header('location:'.base_url().$this->index());
+		}
+	}
+ 
+	public function delete($id){
+		$query = $this->users_model->deleteuser($id);
+ 
+		if($query){
+			header('location:'.base_url().$this->index());
+		}
+	}
+}
+ 
+ 
+?>
+
+
+##ROUTES
+$route['default_controller'] = 'users';
+
+
+
+##user_list.php
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>CodeIgniter Simple CRUD Tutorial</title>
+	<link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>bootstrap/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+	<h1 class="page-header text-center">CodeIgniter Simple CRUD Tutorial</h1>
+	<div class="row">
+		<div class="col-sm-8 col-sm-offset-2">
+			<a href="<?php echo base_url(); ?>index.php/users/addnew" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Add New</a><br><br>
+			<table class="table table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Username</th>
+						<th>Password</th>
+						<th>FullName</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php
+					foreach($users as $user){
+						?>
+						<tr>
+							<td><?php echo $user->id; ?></td>
+							<td><?php echo $user->username; ?></td>
+							<td><?php echo $user->password; ?></td>
+							<td><?php echo $user->fname; ?></td>
+							<td><a href="<?php echo base_url(); ?>index.php/users/edit/<?php echo $user->id; ?>" class="btn btn-success"><span class="glyphicon glyphicon-edit"></span> Edit</a> || <a href="<?php echo base_url(); ?>index.php/users/delete/<?php echo $user->id; ?>" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete</a></td>
+						</tr>
+						<?php
+					}
+					?>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+</body>
+</html>
+
+
+##editform.php
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>CodeIgniter Simple CRUD Tutorial</title>
+	<link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>bootstrap/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+	<h1 class="page-header text-center">CodeIgniter Simple CRUD Tutorial</h1>
+	<div class="row">
+		<div class="col-sm-4 col-sm-offset-4">
+			<h3>Add Form
+				<span class="pull-right"><a href="<?php echo base_url(); ?>" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-left"></span> Back</a></span>
+			</h3>
+			<hr>
+			<form method="POST" action="<?php echo base_url(); ?>index.php/users/insert">
+				<div class="form-group">
+					<label>Username:</label>
+					<input type="text" class="form-control" name="username">
+				</div>
+				<div class="form-group">
+					<label>Password:</label>
+					<input type="text" class="form-control" name="password">
+				</div>
+				<div class="form-group">
+					<label>FullName:</label>
+					<input type="text" class="form-control" name="fname">
+				</div>
+				<button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+			</form>
+		</div>
+	</div>
+</div>
+</body>
+</html>

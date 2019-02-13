@@ -40,8 +40,8 @@ DB_PASSWORD=password
 @AppServiceProvider.php
 ===============================================================================================================================================
 use Illuminate\Supoort\Facades\Schema;
-function boot(){
-    Schema::defaultStringLenght(191);
+public function boot(){
+    Schema::defaultStringLength(191);
 }
 ===============================================================================================================================================
 

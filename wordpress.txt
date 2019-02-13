@@ -1,0 +1,53 @@
+
+####WORDPRESS FUNCTIONS####
+
+##HEAD
+#LANGUAGE                     language_attributes()
+
+#ROOT STYLE                   bloginfo('style_sheet_url')
+#OTHER STYLE                  bloginfo('template_url') /css/bootrap.css
+#CHARSET                      bloginfo('charset')
+#META DESCRIPTION             bloginfo('description')
+#WEBSITE NAME                 bloginfo('name')
+#PAGE TITLE                   wp_title()
+#ENABLE PLUGINS AND WIDGETS   wp_head()
+#WORDPRESS PANEL              wp_footer() 
+
+##PARTS
+HEADER                        get_header(); //header.php
+FOOTER                        get_footer(); //footer.php
+
+##POST
+if(have_posts()):
+  while(have_posts()): the_post();
+    the_permalink();                                      //POST LINK
+      the_title();                                        //POST TITLE
+    the_date();                                           //POST DATE
+    the_time();                                           //POST TIME
+    the_time('F j, Y g:i a');                             //DATE FORMAT
+    the_author();                                         //POST AUTHOR
+
+    if(has_post_thumbnail()):                             //THUMBNAIL
+      the_post_thumbnail();
+    endif;
+
+    echo get_author_posts_url(get_the_author_meta('ID'))  //ALL AUTHOR POST
+    the_content();                                        //POST WHOLE CONTENT
+    the_excerpt();                                        //POST FEW CONTENT LINES ONLY
+  endwhile;
+  else: 
+    _('No Post Found');
+endif;
+
+##LOAD CONTENT.PHP
+get_template_part('content');  
+
+##DETECT SINGLE POST
+if(is_single()):
+else:
+endif;
+
+##SIDE BAR
+if(is_active_sidebar('sidebar')):
+  dynamic_sidebar('sidebar');
+endif;

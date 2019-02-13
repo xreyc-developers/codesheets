@@ -1,0 +1,56 @@
+
+## WEBPACK WITH BABEL
+
+::INSTRUCTIONS
+Open js/app.js in your favorite code editor.
+Modify the application as follows to use some of the new features in ECMAScript 6:
+  - Replace all var definitions with let
+  - Replace all function() definitions with arrow functions
+  - Replace string concatenation with template strings
+  - Replace 'loaders' with 'rules'
+  - Do NOT use ECMAScript 6 promises yet. You will do that in the next unit. 
+
+::install
+>npm install babel-core babel-loader babel-preset-es2015 webpack --save-dev
+
+::webpack.config.js
+
+var path = require('path');
+var webpack = require('webpack');
+ module.exports = {
+     entry: './js/app.js',
+     output: {
+         path: path.resolve(__dirname, 'build'),
+         filename: 'app.bundle.js'
+     },
+     module: {
+         loaders: [
+             {
+                 test: /\.js$/,
+                 loader: 'babel-loader',
+                 query: {
+                     presets: ['es2015']
+                 }
+             }
+         ]
+     },
+     stats: {
+         colors: true
+     },
+     devtool: 'source-map'
+ };
+
+
+::package.json
+
+"scripts": {
+    "webpack": "webpack",
+    "start": "http-server"
+},
+
+
+::create a build directory to host the compiled version of the application.
+npm run webpack
+
+::Open index.html in your code editor, and modify the <script> tag as follows to load build/app.bundle.js, 
+the compiled version of js/app.js:
